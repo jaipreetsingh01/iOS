@@ -45,13 +45,11 @@ struct SideMenuView: View {
                 case .accounts:
                     AccountsListView(rootVM: rootVM)
                 case .settings:
-                    Text("settings")
+                    Text("Settings Page")
                 case .categories:
-                    Text("categories")
+                    Text("Category Page")
                 case .charts:
-                    Text("Charts")
-                case .reminders:
-                    Text("Reminders")
+                    Text("Charts Page")
                 default:
                     EmptyView()
                 }
@@ -82,11 +80,11 @@ extension SideMenuView {
                 
             } label: {
                 HStack(spacing: 15){
-                    Image(systemName: "person.crop.circle")
+                    Image("uts_logo")
                         .resizable()
-                        .frame(width: 60, height: 60)
+                        .frame(width: 86, height: 38)
                         .foregroundColor(Color(.systemGray4))
-                    Text("Sign up")
+                    Text("Assignment 3")
                         .font(.title3.weight(.medium))
                     Spacer()
                 }
@@ -103,7 +101,7 @@ extension SideMenuView {
     }
     
     enum Menu: Int, CaseIterable{
-        case main, accounts, categories, charts, reminders, settings, rateApp, shareApp
+        case main, accounts, categories, charts, settings
         
         var title: String{
             switch self{
@@ -115,22 +113,16 @@ extension SideMenuView {
                 return "Categories"
             case .charts:
                 return "Charts"
-            case .reminders:
-                return "Reminders"
             case .settings:
                 return "Settings"
-            case .rateApp:
-                return "Rate app"
-            case .shareApp:
-                return "Share app"
             }
         }
         
         var isButton: Bool{
             switch self{
-            case .main, .rateApp, .shareApp:
+            case .main:
                 return true
-            case .settings, .accounts, .reminders, .charts, .categories:
+            case .settings, .accounts, .charts, .categories:
                 return false
             }
         }
@@ -140,10 +132,6 @@ extension SideMenuView {
         switch type{
         case .main:
             dismiss()
-        case .rateApp:
-            return
-        case .shareApp:
-            return
         default: break
         }
     }
