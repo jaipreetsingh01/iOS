@@ -1,8 +1,8 @@
 //
 //  RootViewModel.swift
-//  Ass3_ExpensePlanner
+//  Finances Helper
 //
-//  Created by Jaipreet  on 11/05/24.
+//  Created by Jaipreet  on 10/05/24.
 //
 
 import Foundation
@@ -12,19 +12,20 @@ import SwiftUI
 
 final class RootViewModel: ObservableObject{
     
-    @AppStorage("activeAccountId") var activeAccountId: String = ""
+    @AppStorage("activeAccountId") var activeAccountId: String = "" // store recieve from user dedaults
     @AppStorage("savedTimeFilter") var savedTimeFilter: String = ""
     
-    @Published private(set) var activeAccount: AccountEntity?
-    @Published private(set) var statsData = TransactionStatData()
+    @Published private(set) var activeAccount: AccountEntity? // current coount
+    @Published private(set) var statsData = TransactionStatData() // stat data of transaction
     @Published var showSettingsView: Bool = false
     @Published var showCreateAccoutView: Bool = false
     @Published var selectedCategory: CategoryEntity?
-    @Published var currentTab: TransactionType = .expense
-    @Published var timeFilter: TransactionTimeFilter = .day
+    @Published var currentTab: TransactionType = .expense // current tab expense or income
+    @Published var timeFilter: TransactionTimeFilter = .day // deafult time - today, can be week , month etc
     @Published var transactionFullScreen: TransactionType?
-    @Published var showDatePicker: Bool = false
+    @Published var showDatePicker: Bool = false // calender to pick hidden by default
     
+    // manage core data & entities
     let coreDataManager: CoreDataManager
     let userService: UserService
     private let transactionStore: ResourceStore<TransactionEntity>
@@ -59,43 +60,27 @@ final class RootViewModel: ObservableObject{
         self.transactionFullScreen = currentTab
     }
     
-//    private func startCategorySubs(){
-//        $selectedCategory
-//            .sink { category in
-//                guard let category, let id = category.id else {
-//                    self.setTransactions()
-//                    return
-//                }
-//                if category.isParent{
-//                    self.transactions = self.transactions.filter({$0.category?.id == id})
-//                }else{
-//                    self.transactions = self.transactions.filter({$0.subcategoryId == id})
-//                }
-//                self.createChartData()
-//            }
-//            .store(in: &cancellable)
+//    func generateCSV(){
+//        if currentTab == .expense{
+//            Helper.generateCSV(statsData.expenseTransactions)
+//        }else{
+//            Helper.generateCSV(statsData.incomeTransactions)
+//        }
 //    }
-
-    func generateCSV(){
-        if currentTab == .expense{
-            Helper.generateCSV(statsData.expenseTransactions)
-        }else{
-            Helper.generateCSV(statsData.incomeTransactions)
-        }
-    }
    
 }
 
 
-//MARK: - Transaction logic
 extension RootViewModel{
     
+    // fecthing transaction based on time filter
     func fetchTransactions(){
         guard let start = timeFilter.date.start, let end = timeFilter.date.end, let predicate = NSPredicate.transactionPredicate(startDate: start, endDate: end, accountId: activeAccountId) else { return }
         let request = TransactionEntity.fetchRequest(for: predicate)
         transactionStore.fetch(request)
     }
     
+    // update stat data property
     private func startSubsTransaction(){
         transactionStore.resources
             .receive(on: DispatchQueue.main)
@@ -105,6 +90,8 @@ extension RootViewModel{
             .store(in: cancelBag)
     }
     
+    
+    // whenever there is change in time filter, we trigger fetch transaction & redo the stat data
     private func startDateSubsTransaction(){
         $timeFilter
             .dropFirst()
@@ -121,7 +108,6 @@ extension RootViewModel{
     }
 }
 
-//MARK: - Account logic
 extension RootViewModel{
     
     
@@ -136,6 +122,7 @@ extension RootViewModel{
        accountStore.fetch(request)
     }
         
+    // if change to active account, update active account property or if account array is empty then we set boolean as true whihc will show teh create account page
     private func startSubsAccount(){
         accountStore.resources
             .dropFirst()
@@ -150,4 +137,3 @@ extension RootViewModel{
             .store(in: cancelBag)
     }
 }
-
