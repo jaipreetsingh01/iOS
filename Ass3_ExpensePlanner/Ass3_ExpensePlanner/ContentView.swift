@@ -8,14 +8,23 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var rootVM: RootViewModel
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        RootView()
+            .environmentObject(rootVM)
+            .preferredColorScheme(.light)
+            .fullScreenCover(isPresented: $rootVM.showCreateAccoutView) {
+                NavigationStack{
+                    CreateAccountView(rootVM: rootVM, hiddenClose: true)
+                }
+            }
+    }
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+            .environmentObject(RootViewModel(context: dev.viewContext))
     }
 }
 
